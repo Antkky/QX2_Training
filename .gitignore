@@ -1,0 +1,47 @@
+# Compiled object files, static and dynamic libraries
+*.o
+*.obj
+*.so
+*.a
+*.lib
+*.dll
+*.dylib
+
+# Compiled binary executables
+*.exe
+*.out
+*.app
+
+# Build directories and temporary files
+/build/
+/bin/
+/CMakeFiles/
+CMakeCache.txt
+Makefile
+cmake_install.cmake
+
+# Logs and debugging files
+*.log
+*.pdb
+*.lck
+*.stackdump
+*.dbg
+
+# Editor and IDE specific files
+.vscode/
+.idea/
+*.sln
+*.vcxproj*
+*.ncb
+*.user
+*.cache
+*.DS_Store  # macOS Finder metadata
+*.swp       # Vim swap files
+
+# Large prebuilt libraries (use Git LFS or external storage instead)
+lib/libdnnl.a
+lib/libtorch_cpu.so
+
+# Git LFS tracked files (ensure Git LFS is set up)
+.gitattributes
+
