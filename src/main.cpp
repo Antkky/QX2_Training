@@ -7,17 +7,21 @@
 #include "model.cpp"
 #include "environment.cpp"
 
-int select_action(LSTMDQN& model, torch::Tensor state, float epsilon) {
-  std::random_device rd;
+using namespace std;
+using namespace torch;
+using namespace torch::nn;
+
+int select_action(LSTMDQN& model, Tensor state, float epsilon) {
+  random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_real_distribution<float> dist(0.0f, 1.0f);
+  uniform_real_distribution<float> dist(0.0f, 1.0f);
   
   if (dist(gen) < epsilon) {
-      std::uniform_int_distribution<int> action_dist(0, 3);
+      uniform_int_distribution<int> action_dist(0, 3);
       return action_dist(gen);
   } else {
-      torch::NoGradGuard no_grad;
-      torch::Tensor q_values = model.forward(state);
+      NoGradGuard no_grad;
+      Tensor q_values = model.forward(state);
       return q_values.argmax(1).item<int>();
   }
 }
@@ -26,12 +30,12 @@ void evaluate(LSTMDQN& model, Environment& env, int num_episodes = 5) {
   float total_reward = 0.0f;
   
   for (int episode = 0; episode < num_episodes; episode++) {
-      torch::Tensor state = env.reset();
+      Tensor state = env.reset();
       bool done = false;
       float episode_reward = 0.0f;
       
       while (!done) {
-          torch::NoGradGuard no_grad;
+          NoGradGuard no_grad;
           int action = select_action(model, state, 0.0f);
           
           UpdateData update = env.forward(action);
@@ -44,10 +48,10 @@ void evaluate(LSTMDQN& model, Environment& env, int num_episodes = 5) {
       }
       
       total_reward += episode_reward;
-      std::cout << "Evaluation Episode " << episode << " Reward: " << episode_reward << std::endl;
+      cout << "Evaluation Episode " << episode << " Reward: " << episode_reward << endl;
   }
   
-  std::cout << "Average Evaluation Reward: " << total_reward / num_episodes << std::endl;
+  cout << "Average Evaluation Reward: " << total_reward / num_episodes << endl;
 }
 
 
@@ -60,11 +64,11 @@ int main(){
 
     int lr = 0.001;
 
-    std::cout << "State dimension: " << state_dim << std::endl;
+    cout << "State dimension: " << state_dim << endl;
 
     LSTMDQN model(state_dim, hidden_dim, action_dim);
     ReplayBuffer replay_buffer(10000);
-    torch::optim::Adam optimizer(model.parameters(), torch::optim::AdamOptions(lr));
+    optim::Adam optimizer(model.parameters(), optim::AdamOptions(lr));
 
 
     float gamma = 0.99;
@@ -77,7 +81,7 @@ int main(){
     float epsilon = epsilon_start;
 
     for (int episode = 0; episode < num_episodes; episode++) {
-      torch::Tensor state = env.reset();
+      Tensor state = env.reset();
       bool done = false;
       float episode_reward = 0.0f;
 
@@ -96,21 +100,21 @@ int main(){
         state = update.state;
       }
 
-      epsilon = std::max(epsilon_end, epsilon * epsilon_decay);
+      epsilon = max(epsilon_end, epsilon * epsilon_decay);
       if (episode % 10 == 0) {
-        std::cout << "Episode " << episode << " Reward: " << episode_reward 
+        cout << "Episode " << episode << " Reward: " << episode_reward 
                   << " Epsilon: " << epsilon 
-                  << " Buffer Size: " << replay_buffer.size() << std::endl;
+                  << " Buffer Size: " << replay_buffer.size() << endl;
       }
     
       if (episode % 100 == 0) {
-        std::cout << "Evaluating model..." << std::endl;
+        cout << "Evaluating model..." << endl;
         evaluate(model, env);
       }
     }
 
-  } catch (const std::exception& e) {
-    std::cerr << "Error: " << e.what() << std::endl;
+  } catch (const exception& e) {
+    cerr << "Error: " << e.what() << endl;
     return 1;
   }
   return 0;
