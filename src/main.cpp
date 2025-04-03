@@ -55,9 +55,10 @@ void evaluate(LSTMDQN& model, Environment& env, int num_episodes = 5) {
 }
 
 
-int main(){
+int main(int argc, char* argv[]){
   try {
-    Environment env("./data/processed/train_data.csv", 10);
+    string datapath = argv[1];
+    Environment env(datapath, 30);
     int state_dim = env.get_state_dim();
     int action_dim = 4;
     int hidden_dim = 64;
@@ -80,18 +81,26 @@ int main(){
     float epsilon_decay = 0.995f;
     float epsilon = epsilon_start;
 
+    cout << "Starting Episode Loop" << endl;
     for (int episode = 0; episode < num_episodes; episode++) {
       Tensor state = env.reset();
+      cout << state << endl;
       bool done = false;
       float episode_reward = 0.0f;
 
+      cout << "Starting Epoch Loop" << endl;
       while (!done) {
+        cout << "Selecting_Action" << endl;
         int action = select_action(model, state, epsilon);
+        cout << "Stepping Environment" << endl;
         UpdateData update = env.forward(action);
+        cout << update.state << endl;
         episode_reward += update.reward;
         
+        cout << "Pushing_Memory" << endl;
         replay_buffer.push(state, action, update.reward, update.state, update.done);
 
+        cout << "Training" << endl;
         train(model, replay_buffer, optimizer, gamma, batch_size);
 
         done = update.done;

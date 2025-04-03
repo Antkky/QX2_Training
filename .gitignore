@@ -10,9 +10,13 @@ __pycache__/
 # C extensions
 *.so
 
+data/*
+build/*
+bin/*
+
 # Distribution / packaging
 .Python
-build/
+build/*
 develop-eggs/
 dist/
 downloads/
@@ -189,8 +193,6 @@ pyrightconfig.json
 *.app
 
 # Build directories and temporary files
-/build/
-/bin/
 /CMakeFiles/
 CMakeCache.txt
 Makefile

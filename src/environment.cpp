@@ -185,6 +185,8 @@ torch::Tensor Environment::reset()
 torch::Tensor Environment::current_state()
 {
   vector<float> state_vec;
+
+  cout << state_vec << endl;
   
   for (int i = current_step - window_size; i < current_step; i++) {
     state_vec.push_back(data[i].spread_zscore);
